@@ -23,7 +23,7 @@ Compose UI components and WebView integration.
 
 1. Clone this repository:
    ```sh
-   git clone https://github.com/yourusername/ComposeWebView.git
+   git clone https://github.com/oguzhanaslann/ComposeWebView.git
    ```
 
 2. Open the project in Android Studio.

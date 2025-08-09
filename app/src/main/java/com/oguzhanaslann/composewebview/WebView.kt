@@ -1,12 +1,20 @@
 package com.oguzhanaslann.composewebview
 
+import android.content.Intent
+import android.graphics.Bitmap
 import android.util.Base64
 import android.view.ViewGroup
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -65,7 +73,7 @@ fun WebViewHtmlCompose(
 fun WebViewHtmlCompose(
     modifier: Modifier = Modifier,
     htmlContent: String,
-    mimetype :String,
+    mimetype: String,
     encoding: String
 ) {
     var webView: WebView? = null
@@ -77,7 +85,8 @@ fun WebViewHtmlCompose(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
-                val encodedHtml = Base64.encodeToString(htmlContent.toByteArray(), Base64.NO_PADDING)
+                val encodedHtml =
+                    Base64.encodeToString(htmlContent.toByteArray(), Base64.NO_PADDING)
                 loadData(encodedHtml, mimetype, encoding)
                 webView = this
             }
@@ -115,17 +124,19 @@ fun WebViewHtmlAssetCompose(
 @Composable
 fun previewWebView() {
     WebViewCompose(
-        modifier  = Modifier
+        modifier = Modifier
             .border(4.dp, androidx.compose.ui.graphics.Color.Red),
-        url = "https://www.google.com")
+        url = "https://www.google.com"
+    )
 
 }
 
 @Preview
 @Composable
 private fun previewWebViewLoadData() {
-    WebViewHtmlCompose(htmlContent =
-        """
+    WebViewHtmlCompose(
+        htmlContent =
+            """
         <html>
             <body>
                 <h1 style="color: #FF5722;">Hello, Compose WebView!</h1>
@@ -147,7 +158,7 @@ private fun previewWebViewLoadData() {
 private fun previewLoadDataWithBaseURL() {
     WebViewHtmlCompose(
         htmlContent =
-        """
+            """
         <html>
             <body>
                 <h1 style="color: #673AB7;">LoadDataWithBaseURL Preview</h1>
@@ -201,5 +212,62 @@ fun WebViewHtmlAssetWithJavaScriptBinding(
 private fun previewWebViewHtmlAssetFunctionCall() {
     WebViewHtmlAssetWithJavaScriptBinding(
         assetFileName = "function_call_sample.html"
+    )
+}
+
+
+@Composable
+fun WebViewBackHandling(
+    modifier: Modifier = Modifier,
+    url: String,
+) {
+    var backEnabled by remember { mutableStateOf(false) }
+    var webView: WebView? = null
+
+    BackHandler(enabled = backEnabled) {
+        webView?.goBack()
+    }
+
+    AndroidView(
+        modifier = modifier,
+        factory = { context ->
+            WebView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+
+                webViewClient = object : WebViewClient() {
+                    override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
+                        backEnabled = view.canGoBack()
+                    }
+
+                    override fun shouldOverrideUrlLoading(
+                        view: WebView?,
+                        request: WebResourceRequest?
+                    ): Boolean {
+                        val urlToLoad = request?.url?.toString() ?: return false
+                        if (urlToLoad.contains("medium.com")) {
+                            return false
+                        }
+                        view?.context?.startActivity(Intent(Intent.ACTION_VIEW, request.url))
+                        return true
+                    }
+                }
+                loadUrl(url)
+                webView = this
+            }
+        }, update = {
+            webView = it
+        })
+}
+
+@Preview
+@Composable
+private fun previewWebViewBackHandling() {
+    WebViewBackHandling(
+        modifier = Modifier
+            .border(2.dp, androidx.compose.ui.graphics.Color.Blue),
+        url = "https://www.google.com"
     )
 }

@@ -38,7 +38,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ComposeWebViewTheme {
-                CustomTabsView()
+                //MainScreen()
+                WebViewHtmlAssetWithJavaScriptBinding(
+                    assetFileName = "function_call_sample.html"
+                )
             }
         }
     } 
@@ -46,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun MainScreen() {
-    val url = remember { "https://www.google.com" }
+    val url = remember { "https://maps.google.com" }
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding)

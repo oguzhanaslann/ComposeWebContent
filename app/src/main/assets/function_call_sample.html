@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android WebView Bridge Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .info-button {
+            background-color: #2196F3;
+        }
+        .info-button:hover {
+            background-color: #1976D2;
+        }
+        #deviceInfo {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e8;
+            border-radius: 5px;
+            display: none;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Android Bridge Demo</h1>
+
+    <input type="text" id="messageInput" placeholder="Enter your message here"
+           value="Hello from WebView!">
+
+    <button onclick="showCustomToast()">Show Custom Toast</button>
+
+    <button onclick="showQuickToast()">Show Quick Toast</button>
+
+    <button class="info-button" onclick="getDeviceInfo()">Get Device Info</button>
+
+    <div id="deviceInfo"></div>
+</div>
+
+<script>
+    function showCustomToast() {
+        const message = document.getElementById('messageInput').value;
+        if (message.trim() === '') {
+            alert('Please enter a message first!');
+            return;
+        }
+
+        try {
+            NativeApp.displayMessage(message);
+        } catch (error) {
+            alert('Error: Android interface not available');
+        }
+    }
+
+    function showQuickToast() {
+        try {
+            NativeApp.displayMessage('Quick toast from web!');
+        } catch (error) {
+            alert('Error: Android interface not available');
+        }
+    }
+
+    function getDeviceInfo() {
+        try {
+            const deviceInfo = NativeApp.getDeviceInfo();
+            const infoDiv = document.getElementById('deviceInfo');
+            infoDiv.innerHTML = '<strong>Device Info:</strong> ' + deviceInfo;
+            infoDiv.style.display = 'block';
+        } catch (error) {
+            alert('Error: Android interface not available');
+        }
+    }
+</script>
+</body>
+</html>

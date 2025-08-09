@@ -6,6 +6,7 @@ import android.webkit.WebView
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -163,5 +164,42 @@ private fun previewLoadDataWithBaseURL() {
 private fun previewWebViewHtmlAsset() {
     WebViewHtmlAssetCompose(
         assetFileName = "sample.html"
+    )
+}
+
+@Composable
+fun WebViewHtmlAssetWithJavaScriptBinding(
+    modifier: Modifier = Modifier,
+    assetFileName: String
+) {
+    val assetUrl = "file:///android_asset/$assetFileName"
+    var webView: WebView? = null
+    AndroidView(
+        modifier = modifier,
+        factory = { context ->
+            WebView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                loadUrl(assetUrl)
+                settings.javaScriptEnabled = true
+                webView = this
+                webView?.addJavascriptInterface(AppBridge(context), "NativeApp")
+            }
+        },
+        update = {
+            webView = it
+            webView?.addJavascriptInterface(AppBridge(it.context), "NativeApp")
+        }
+    )
+}
+
+
+@Preview
+@Composable
+private fun previewWebViewHtmlAssetFunctionCall() {
+    WebViewHtmlAssetWithJavaScriptBinding(
+        assetFileName = "function_call_sample.html"
     )
 }

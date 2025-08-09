@@ -38,10 +38,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ComposeWebViewTheme {
-                //MainScreen()
-                WebViewHtmlAssetWithJavaScriptBinding(
-                    assetFileName = "function_call_sample.html"
-                )
+                MainScreen()
             }
         }
     } 
